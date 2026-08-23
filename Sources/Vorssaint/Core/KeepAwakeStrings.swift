@@ -41,6 +41,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 
@@ -59,6 +60,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -127,6 +129,11 @@ extension KeepAwakeDisplaySleepStrings {
     static let zhHK = KeepAwakeDisplaySleepStrings(
         allowDisplaySleep: "允許顯示器進入睡眠",
         allowDisplaySleepCaption: "Mac 保持喚醒，顯示器仍會按正常時間關閉。"
+    )
+
+    static let vi = KeepAwakeDisplaySleepStrings(
+        allowDisplaySleep: "Cho phép màn hình ngủ",
+        allowDisplaySleepCaption: "Giữ Mac ở trạng thái thức trong khi màn hình vẫn tắt theo bộ đếm giờ ngủ bình thường."
     )
 }
 
@@ -272,5 +279,16 @@ extension KeepAwakeAutomationStrings {
         powerToggle: "電源",
         powerActive: "連接電源期間保持喚醒",
         automationActive: "因符合自動條件而保持喚醒"
+    )
+
+    static let vi = KeepAwakeAutomationStrings(
+        automationSection: "Tự động hóa",
+        automationCaption: "Bắt đầu khi bất kỳ điều kiện đã chọn nào được đáp ứng.",
+        automationOff: "Tắt",
+        externalDisplayToggle: "Màn hình ngoài",
+        externalDisplayActive: "Hoạt động khi có màn hình ngoài được kết nối",
+        powerToggle: "Nguồn điện",
+        powerActive: "Hoạt động khi đang cắm nguồn điện",
+        automationActive: "Hoạt động vì một điều kiện tự động đã được đáp ứng"
     )
 }
