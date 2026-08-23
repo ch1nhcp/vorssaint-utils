@@ -80,6 +80,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -876,5 +877,66 @@ extension RadialMenuFeatureStrings {
         activationModePress: "按下以開啟",
         activationModeHold: "按住以選擇",
         activationModeCaption: "按下或按住會保留目前的自適應手勢。按下模式會保持開啟；按住模式會在放開時執行醒目顯示的動作。"
+    )
+
+    static let vi = RadialMenuFeatureStrings(
+        pageTitle: "Menu hình tròn",
+        hubDescription: "Mở một vòng tròn chứa các hành động yêu thích quanh con trỏ",
+        enableLabel: "Dùng menu hình tròn",
+        enableCaption: "Giữ phím tắt, trỏ vào một hành động rồi thả ra. Nhấn nhanh sẽ giữ vòng tròn luôn mở.",
+        positionLabel: "Mở tại",
+        positionPointer: "Vị trí con trỏ",
+        positionCenter: "Giữa màn hình",
+        tryButton: "Dùng thử",
+        actionsHeader: "Hành động",
+        addButton: "Thêm hành động",
+        limitCaption: "Một vòng tròn chứa được tối đa 12 hành động.",
+        emptyCaption: "Chưa có hành động nào ở đây.",
+        backButton: "Quay lại",
+        editActionsButton: "Chỉnh sửa hành động",
+        nameLabel: "Tên",
+        automaticLabel: "Tự động",
+        iconLabel: "Biểu tượng",
+        actionLabel: "Hành động",
+        kindApp: "Mở một ứng dụng",
+        kindFile: "Mở tệp hoặc thư mục",
+        kindURL: "Mở một liên kết",
+        kindShortcut: "Nhấn tổ hợp phím",
+        kindTool: "Công cụ Vorssaint",
+        kindMedia: "Điều khiển phương tiện",
+        kindSubmenu: "Menu con",
+        chooseButton: "Chọn…",
+        urlPlaceholder: "example.com",
+        urlInvalid: "Nhập một liên kết hợp lệ.",
+        toolLabel: "Công cụ",
+        mediaLabel: "Điều khiển",
+        mediaPlayPause: "Phát hoặc tạm dừng",
+        mediaPrevious: "Bài trước",
+        mediaNext: "Bài tiếp theo",
+        mediaNowPlaying: "Đang phát",
+        mediaNothingPlaying: "Không có gì đang phát",
+        mediaOpenAppFormat: "Mở %@",
+        submenuCaption: "Mở một vòng tròn thứ hai với các hành động riêng.",
+        saveButton: "Lưu",
+        deleteButton: "Xóa",
+        permissionCaption: "Hành động bằng phím và kích hoạt bằng nút chuột phụ cần quyền Trợ năng.",
+        manageButton: "Quản lý menu",
+        panelCaption: "Các hành động yêu thích trên một vòng tròn",
+        mouseTriggerLabel: "Nút chuột",
+        mouseTriggerOff: "Tắt",
+        mouseTriggerBack: "Nút phụ Quay lại",
+        mouseTriggerForward: "Nút phụ Tiến tới",
+        mouseTriggerWarning: "Khi bật, nút này sẽ không còn dùng để lùi hoặc tiến trong ứng dụng nữa. Nếu vẫn cần dùng nút này để điều hướng, hãy để tắt.",
+        buttonTestLabel: "Kiểm tra nút",
+        buttonTestWaiting: "Nhấn nút ngay bây giờ",
+        buttonTestSeen: "Vorssaint nhận diện được nút này",
+        buttonTestOther: "Đó là một nút khác",
+        buttonTestBlind: "Vorssaint hiện không thể theo dõi chuột",
+        buttonTestHint: "Nếu không có gì sáng lên, macOS không gửi nút đó cho ứng dụng. Chuột có phần mềm riêng thường đổi nút phụ thành chức năng khác. Hãy đổi lại ở đó, hoặc gán một tổ hợp phím cho nút này rồi dùng tổ hợp đó ở trên.",
+        activationModeLabel: "Cách mở",
+        activationModePressOrHold: "Nhấn hoặc giữ",
+        activationModePress: "Nhấn để mở",
+        activationModeHold: "Giữ để chọn",
+        activationModeCaption: "Nhấn hoặc giữ sẽ duy trì cử chỉ thích ứng hiện tại. Nhấn giữ menu mở; giữ sẽ thực hiện hành động đang tô sáng khi thả ra."
     )
 }

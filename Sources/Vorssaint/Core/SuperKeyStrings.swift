@@ -37,6 +37,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -274,5 +275,23 @@ extension SuperKeyStrings {
         panelCaptionFormat: "大寫鎖定鍵會按住 %@。",
         manageButton: "設定…",
         soloInputSource: "切換輸入法；長撳切換大寫鎖定"
+    )
+
+    static let vi = SuperKeyStrings(
+        pageTitle: "Phím Super",
+        hubDescription: "Biến Caps Lock thành tổ hợp phím bổ trợ đã chọn.",
+        enableToggle: "Dùng Caps Lock làm phím Super",
+        enableCaption: "Giữ phím này và nhấn một phím bất kỳ. Chọn một hoặc nhiều phím bổ trợ bên dưới.",
+        capsLockKey: "Caps Lock",
+        holdHint: "Giữ",
+        soloSection: "Nhấn một mình",
+        soloCaption: "Hành động khi nhấn nhanh mà không có phím nào khác đi kèm.",
+        soloNothing: "Không làm gì",
+        soloCapsLock: "Bật/tắt chữ hoa",
+        soloEscape: "Nhấn Escape",
+        activeNow: "Đang hoạt động",
+        panelCaptionFormat: "Caps Lock giữ %@.",
+        manageButton: "Thiết lập…",
+        soloInputSource: "Chuyển nguồn nhập; giữ để dùng Caps Lock"
     )
 }

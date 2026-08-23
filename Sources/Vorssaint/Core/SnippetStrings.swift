@@ -61,6 +61,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -573,5 +574,44 @@ extension SnippetFeatureStrings {
         folderPlaceholder: "工作",
         showInLibraryLabel: "在快捷選單中顯示",
         variablesFormatCaption: "喺冒號後加上格式就可以自訂樣式,例如 {{date:yyyy-MM-dd}}。"
+    )
+
+    static let vi = SnippetFeatureStrings(
+        pageTitle: "Gõ tắt văn bản",
+        hubDescription: "Từ gõ tắt ngắn sẽ mở rộng thành văn bản đầy đủ",
+        enable: "Mở rộng gõ tắt khi nhập",
+        enableCaption: "Gõ một từ gõ tắt ở bất kỳ đâu và nó sẽ biến thành văn bản tương ứng. Mọi thứ chỉ lưu trên Mac này.",
+        addButton: "Thêm gõ tắt",
+        newTitle: "Gõ tắt mới",
+        editTitle: "Chỉnh sửa gõ tắt",
+        nameLabel: "Tên",
+        namePlaceholder: "Email cá nhân",
+        triggerLabel: "Từ gõ tắt",
+        triggerPlaceholder: ";email",
+        replacementLabel: "Văn bản",
+        replacementPlaceholder: "myemail@example.com",
+        expansionLabel: "Mở rộng",
+        expansionImmediate: "Ngay lập tức",
+        expansionDelimiter: "Sau dấu cách, Tab hoặc Return",
+        variablesHint: "Biến: {{date}}, {{time}}, {{datetime}}, {{clipboard}}",
+        variablesCaption: "Chúng sẽ biến thành ngày, giờ và văn bản đã sao chép tại thời điểm mở rộng.",
+        emptyList: "Chưa có gõ tắt nào. Thêm cái đầu tiên.",
+        duplicateTrigger: "Một gõ tắt khác đã dùng từ gõ tắt này.",
+        triggerTooShort: "Từ gõ tắt cần ít nhất 2 ký tự.",
+        deleteButton: "Xóa",
+        saveButton: "Lưu",
+        manageButton: "Quản lý gõ tắt",
+        ignoreCaseLabel: "Bỏ qua chữ hoa/thường",
+        libraryTitle: "Menu gõ tắt nhanh",
+        libraryToggle: "Mở gõ tắt từ một menu",
+        libraryCaption: "Phím tắt mở một menu có thể tìm kiếm. Chọn một gõ tắt sẽ gõ ngay vào vị trí con trỏ.",
+        librarySearchPlaceholder: "Tìm gõ tắt",
+        libraryNoResults: "Không có gõ tắt nào khớp với tìm kiếm.",
+        libraryEmpty: "Chưa có gì để hiển thị. Thêm gõ tắt, hoặc bật 'Hiển thị trong menu nhanh' cho những gõ tắt dùng nhiều nhất.",
+        libraryFooterHint: "↩ chèn · esc đóng",
+        folderLabel: "Thư mục",
+        folderPlaceholder: "Công việc",
+        showInLibraryLabel: "Hiển thị trong menu nhanh",
+        variablesFormatCaption: "Định dạng sau dấu hai chấm sẽ chọn cách hiển thị, ví dụ {{date:yyyy-MM-dd}}."
     )
 }
