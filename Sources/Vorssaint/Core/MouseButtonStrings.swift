@@ -45,6 +45,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -386,5 +387,31 @@ extension MouseButtonFeatureStrings {
         panelCaption: "額外按鍵和側滾輪方向會按下你選擇的按鍵組合。",
         sideWheelLeftName: "側滾輪向左",
         sideWheelRightName: "側滾輪向右"
+    )
+
+    static let vi = MouseButtonFeatureStrings(
+        pageTitle: "Phím tắt nút chuột",
+        hubDescription: "Nút phụ và hướng của con lăn bên sẽ nhấn tổ hợp phím tự chọn.",
+        enableLabel: "Dùng nút phụ làm phím tắt",
+        enableCaption: "Mỗi nút phụ hoặc hướng của con lăn bên có thể tự động nhấn một tổ hợp phím. Trong khi có phím tắt, chức năng trước đó của nút sẽ tạm ngừng.",
+        addButton: "Thêm nút hoặc con lăn bên",
+        captureWaiting: "Bây giờ hãy nhấn một nút phụ hoặc di chuyển con lăn bên.",
+        captureCancel: "Hủy",
+        captureBlind: "Vorssaint hiện không thể theo dõi chuột.",
+        captureUnsupported: "Thao tác đó không thể gán phím tắt. Hãy dùng nút phụ hoặc hướng của con lăn bên.",
+        captureWheel: "Nút đó đã dùng để mở menu hình tròn. Hãy chọn nút khác, hoặc gỡ chức năng đó trước.",
+        captureExists: "Nút hoặc hướng đó đã có trong danh sách bên dưới.",
+        captureHint: "Nếu không có gì xảy ra, phần mềm riêng của chuột có thể đã dùng thao tác đó.",
+        backButtonName: "Nút bên quay lại",
+        forwardButtonName: "Nút bên tiến tới",
+        otherButtonFormat: "Nút %d",
+        setShortcutButton: "Đặt phím tắt",
+        removeButton: "Xóa",
+        emptyCaption: "Chưa có phím tắt nào. Hãy thêm nút hoặc hướng của con lăn bên.",
+        rowWheelNote: "Nút này hiện dùng để mở menu hình tròn, nên phím tắt đang chờ.",
+        manageButton: "Thiết lập…",
+        panelCaption: "Nút phụ và hướng của con lăn bên nhấn tổ hợp phím tự chọn.",
+        sideWheelLeftName: "Con lăn bên sang trái",
+        sideWheelRightName: "Con lăn bên sang phải"
     )
 }

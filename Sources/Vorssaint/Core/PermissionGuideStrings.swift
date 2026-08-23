@@ -33,6 +33,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -168,5 +169,15 @@ extension PermissionGuideStrings {
         waiting: "正在等待權限…",
         granted: "已授予權限！",
         closeHelp: "關閉"
+    )
+
+    static let vi = PermissionGuideStrings(
+        title: "Còn một bước nữa",
+        stepOpen: "macOS đã mở Cài đặt Hệ thống ở đúng danh sách.",
+        stepToggle: "Bật Vorssaint trong danh sách đó.",
+        stepReturn: "Quay lại đây. Thẻ này sẽ tự nhận biết.",
+        waiting: "Đang chờ quyền…",
+        granted: "Đã cấp quyền!",
+        closeHelp: "Đóng"
     )
 }
