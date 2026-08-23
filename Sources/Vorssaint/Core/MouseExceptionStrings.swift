@@ -40,6 +40,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -186,5 +187,16 @@ extension MouseExceptionStrings {
         captionNavigation: "在這些 App 裡側鍵繼續做它們原本做的事。",
         captionButtonShortcuts: "在這些 App 裡按鍵快速鍵保持安靜，按下會傳給 App。",
         captionMiddleClick: "在這些 App 裡三指點按仍是普通點按。"
+    )
+
+    static let vi = MouseExceptionStrings(
+        listTitle: "Ứng dụng không can thiệp",
+        addButton: "Thêm ứng dụng…",
+        removeButton: "Xóa",
+        captionSmoothScroll: "Trong các ứng dụng này, con lăn chuột vẫn giữ nguyên từng nấc gạt, dành cho các ứng dụng tự đọc con lăn theo cách riêng, như công cụ 3D và thiết kế.",
+        captionScrollDirection: "Trong các ứng dụng này, con lăn chuột vẫn giữ hướng cuộn mà macOS đưa ra.",
+        captionNavigation: "Trong các ứng dụng này, các nút bên vẫn thực hiện chức năng mà ứng dụng đã gán sẵn.",
+        captionButtonShortcuts: "Các phím tắt gán cho nút chuột sẽ không hoạt động trong các ứng dụng này, thao tác nhấn sẽ được chuyển thẳng đến ứng dụng.",
+        captionMiddleClick: "Thao tác nhấn ba ngón vẫn là một cú nhấp chuột bình thường trong các ứng dụng này."
     )
 }
