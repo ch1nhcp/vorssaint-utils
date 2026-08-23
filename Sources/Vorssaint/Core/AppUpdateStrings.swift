@@ -55,6 +55,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -513,5 +514,40 @@ extension AppUpdateStrings {
         homebrewBadge: "Homebrew",
         sourcesTitle: "來源",
         includeHomebrewToggle: "包含 Homebrew App"
+    )
+
+    static let vi = AppUpdateStrings(
+        pageTitle: "Cập nhật ứng dụng",
+        hubDescription: "Tìm và cài đặt bản cập nhật cho các ứng dụng đang có",
+        caption: "Kiểm tra xem các ứng dụng trên Mac này có phiên bản mới hơn không và cập nhật những ứng dụng đã chọn, không cần mở từng cửa hàng riêng.",
+        panelCaption: "Xem ứng dụng nào có phiên bản mới hơn",
+        checkNow: "Kiểm tra ngay",
+        checking: "Đang kiểm tra",
+        lastCheckFormat: "Lần kiểm tra gần nhất %@",
+        neverChecked: "Chưa kiểm tra",
+        upToDate: "Mọi ứng dụng đều đã cập nhật",
+        coverageNote: "Bao gồm các ứng dụng cài bằng Homebrew và ứng dụng từ App Store. Ứng dụng có trình cập nhật riêng vẫn tự cập nhật như bình thường.",
+        selectAll: "Chọn tất cả",
+        clearSelection: "Bỏ chọn",
+        updateSelectedFormat: "Cập nhật %d",
+        updateOne: "Cập nhật",
+        openAppStore: "Mở App Store",
+        appStoreBadge: "App Store",
+        storeHint: "Mở App Store, nơi bản cập nhật này được cài đặt",
+        frequencyLabel: "Kiểm tra ở chế độ nền",
+        frequencyOff: "Tắt",
+        frequencyDaily: "Mỗi ngày",
+        frequencyWeekly: "Mỗi tuần",
+        nextCheckFormat: "Lần kiểm tra tiếp theo %@",
+        notifyToggle: "Báo khi có ứng dụng cần cập nhật",
+        includeStoreToggle: "Bao gồm ứng dụng từ App Store",
+        includeStoreCaption: "Hỏi Apple phiên bản hiện tại của các ứng dụng lấy từ cửa hàng. Tắt để mọi lượt kiểm tra chỉ diễn ra trên Mac này.",
+        packageMissing: "Chưa cài Homebrew nên chưa thể cập nhật ứng dụng từ đây.",
+        notificationBodyFormat: "%@ ứng dụng có phiên bản mới hơn.",
+        notificationBodyOne: "Một ứng dụng có phiên bản mới hơn.",
+        showInPanel: "Hiển thị trong bảng",
+        homebrewBadge: "Homebrew",
+        sourcesTitle: "Nguồn",
+        includeHomebrewToggle: "Bao gồm ứng dụng Homebrew"
     )
 }
