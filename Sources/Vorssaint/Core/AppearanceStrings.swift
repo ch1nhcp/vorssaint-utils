@@ -26,6 +26,7 @@ extension FeatureStrings {
         case .zhHans: return .zhHans
         case .zhTW: return .zhTW
         case .zhHK: return .zhHK
+        case .vi: return .vi
         }
     }
 }
@@ -120,5 +121,12 @@ extension AppearanceStrings {
         system: "跟隨系統",
         light: "淺色",
         dark: "深色"
+    )
+
+    static let vi = AppearanceStrings(
+        label: "Giao diện",
+        system: "Hệ thống",
+        light: "Sáng",
+        dark: "Tối"
     )
 }
