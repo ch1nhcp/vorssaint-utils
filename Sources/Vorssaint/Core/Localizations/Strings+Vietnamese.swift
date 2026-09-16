@@ -21,6 +21,14 @@ extension Strings {
         menuEdit: "Chỉnh sửa",
         menuUndo: "Hoàn tác",
         menuRedo: "Làm lại",
+        actionClear: "Xóa",
+        actionRemove: "Xóa",
+        actionBack: "Quay lại",
+        actionSearch: "Tìm kiếm",
+        actionMute: "Tắt tiếng",
+        actionUnmute: "Bật tiếng",
+        actionPlay: "Phát",
+        actionPause: "Tạm dừng",
         menuCut: "Cắt",
         menuCopy: "Sao chép",
         menuPaste: "Dán",
@@ -114,6 +122,9 @@ extension Strings {
         tabAbout: "Giới thiệu",
         tabReleaseNotes: "Có gì mới",
         releaseNotesOnUpdateToggle: "Hiện thông tin cập nhật sau khi cập nhật",
+        minimalWindowPreviews: "Xem trước tối giản",
+        minimalWindowPreviewsCaption:
+            "Ẩn tiêu đề, nút và chi tiết trang trí trong hình xem trước ở Dock và bộ chuyển đổi. Mục đang chọn vẫn hiện rõ.",
         previewSizeLabel: "Kích thước xem trước",
         previewSizeNormal: "Bình thường",
         previewSizeLarge: "Lớn",
@@ -463,13 +474,13 @@ extension Strings {
         homebrewOperationUpdatedHomebrew: "Đã cập nhật Homebrew.",
         homebrewOperationFailedFormat: "Không thể hoàn tất %@.",
         homebrewOperationCancelled: "Đã hủy thao tác.",
-        homebrewOperationPreparing: "Đang chuẩn bị...",
-        homebrewOperationDownloading: "Đang tải tệp...",
-        homebrewOperationInstalling: "Đang cài đặt tệp...",
-        homebrewOperationUninstalling: "Đang xóa tệp...",
-        homebrewOperationUpgrading: "Đang cập nhật tệp...",
-        homebrewOperationFinalizing: "Đang hoàn tất...",
-        homebrewOperationRefreshing: "Đang làm mới danh sách...",
+        homebrewOperationPreparing: "Đang chuẩn bị…",
+        homebrewOperationDownloading: "Đang tải tệp…",
+        homebrewOperationInstalling: "Đang cài đặt tệp…",
+        homebrewOperationUninstalling: "Đang xóa tệp…",
+        homebrewOperationUpgrading: "Đang cập nhật tệp…",
+        homebrewOperationFinalizing: "Đang hoàn tất…",
+        homebrewOperationRefreshing: "Đang làm mới danh sách…",
         homebrewOperationTerminal: "Tiếp tục trong Terminal.",
         homebrewOperationElapsedFormat: "Đã trôi qua %@",
         homebrewOperationShowDetails: "Hiện chi tiết",
@@ -583,17 +594,22 @@ extension Strings {
         shelfHint: "Nhấp để chọn. Kéo ra để sử dụng, hoặc nhấp chuột phải để xem thêm thao tác.",
         shelfItemImage: "Ảnh",
         shelfTooltipItemsFormat: "%d mục",
+        shelfTooltipItemsFew: "%d mục",
         shelfTooltipImageSingular: "%d ảnh",
+        shelfTooltipImageFew: "%d ảnh",
         shelfTooltipImagePlural: "%d ảnh",
         shelfTooltipFileSingular: "%d tệp",
+        shelfTooltipFileFew: "%d tệp",
         shelfTooltipFilePlural: "%d tệp",
         shelfTooltipNoteSingular: "%d ghi chú",
+        shelfTooltipNoteFew: "%d ghi chú",
         shelfTooltipNotePlural: "%d ghi chú",
         shelfTooltipLinkSingular: "%d liên kết",
+        shelfTooltipLinkFew: "%d liên kết",
         shelfTooltipLinkPlural: "%d liên kết",
         shelfActionOpen: "Mở",
         shelfActionOpenWith: "Mở bằng",
-        shelfActionAirDrop: "Chia sẻ qua AirDrop",
+        shelfActionShare: "Chia sẻ",
 
         breakdownMeasuring: "Đang đo…",
 
@@ -926,11 +942,6 @@ extension Strings {
         discordIntroTitle: "Cộng đồng Vorssaint trên Discord vừa mới bắt đầu",
         discordIntroMessage:
             "Cộng đồng Vorssaint còn mới và đang được xây dựng. Hãy tham gia sớm để gặp gỡ những người dùng khác và cùng góp phần tạo nên một không gian thân thiện quanh ứng dụng.",
-        discordIntroBenefitHelp: "Nhận trợ giúp và chia sẻ cách sử dụng",
-        discordIntroBenefitFeedback:
-            "Báo lỗi, đề xuất cải tiến và góp phần định hình những gì sắp tới",
-        discordIntroBenefitPreviews:
-            "Xem trước những gì đang được phát triển, bản xem trước sớm và tin tức phát hành",
         discordIntroJoinButton: "Tham gia cộng đồng Discord",
         communityIntroTitle: "Xem trước mọi người",
         communityIntroMessage:
@@ -1044,6 +1055,9 @@ extension Strings {
         qrResultOpen: "Mở liên kết",
         highlightsTitle: "Mới trong bản cập nhật này",
         highlightsTitleClipboardRedesign: "Bộ nhớ tạm được thiết kế lại",
+        highlightsTitleWindowLayout: "Bố cục cửa sổ",
+        highlightsTitleQuitProtection: "Bảo vệ khi thoát & đóng",
+        highlightsTitleRecorderBlur: "Làm mờ riêng tư khi ghi hình",
         highlightsCaptionDockPreview:
             "Dock Preview giờ hoạt động được cả khi bật hiệu ứng phóng to Dock",
         highlightsCaptionScreenshot:
@@ -1054,6 +1068,12 @@ extension Strings {
             "Một phím tắt duy nhất giờ mở ra một bảng nổi cho chụp màn hình, ghi hình, văn bản trên màn hình và màu sắc, cùng các tùy chỉnh gần đó.",
         highlightsCaptionClipboardRedesign:
             "Lịch sử bộ nhớ tạm giờ mở ra dưới dạng một bảng gọn nhẹ với các dòng rõ ràng và một bản xem trước theo yêu cầu để đọc hoặc chỉnh sửa toàn bộ mục.",
+        highlightsCaptionWindowLayout:
+            "Định vị cửa sổ bằng vòng định hướng qua phím tắt và con trỏ, hoặc kéo đến cạnh màn hình để ghim với khoảng cách tùy chỉnh.",
+        highlightsCaptionQuitProtection:
+            "Tránh thoát ứng dụng hoặc đóng cửa sổ ngoài ý muốn bằng cách giữ, nhấn đúp hoặc thêm phím bổ trợ, tùy chỉnh riêng cho từng ứng dụng.",
+        highlightsCaptionRecorderBlur:
+            "Ẩn thông tin cá nhân, mật khẩu và khu vực nhạy cảm ở bất kỳ đâu trong video đã ghi trước khi chia sẻ hoặc xuất.",
         highlightsConfigure: "Thiết lập",
         highlightsTry: "Dùng thử",
         highlightsSeeAll: "Xem tất cả thay đổi",
@@ -1078,7 +1098,7 @@ extension Strings {
         urlCleanerRulesCaption:
             "Một trang web gắn các tham số này vào liên kết chia sẻ của riêng nó để theo dõi nguồn gốc liên kết. Khi bật, tên đó sẽ bị xóa lúc làm sạch liên kết; khi tắt, nó vẫn được giữ lại. Các tên tự thêm có thể xóa được.",
         urlCleanerRulesCoverageCaption:
-            "Danh sách bao gồm các đường dẫn chia sẻ khác nhau của một trang — trang web, ứng dụng, phòng trực tiếp — nên khá dài; một liên kết thực tế thường chỉ mang theo hai đến bốn tham số trong số đó.",
+            "Danh sách bao gồm các đường dẫn chia sẻ khác nhau của một trang (trang web, ứng dụng, phòng trực tiếp), nên khá dài; một liên kết thực tế thường chỉ mang theo hai đến bốn tham số trong số đó.",
         urlCleanerRulesAllSites: "Tất cả trang web",
         urlCleanerRulesCountSingular: "1 tham số",
         urlCleanerRulesCountPluralFormat: "%d tham số",
@@ -1117,6 +1137,9 @@ extension Strings {
         switcherScreenPlacementActiveWindow: "Màn hình có cửa sổ đang hoạt động",
         switcherScreenPlacementCaption:
             "Bộ chuyển đổi mở trên màn hình nào khi có nhiều hơn một màn hình được kết nối.",
+        switcherCurrentDisplayOnly: "Chỉ hiện màn hình hiện tại",
+        switcherCurrentDisplayOnlyCaption:
+            "Chỉ liệt kê các cửa sổ trên màn hình có con trỏ. Nếu màn hình đó không có cửa sổ nào, bộ chuyển đổi sẽ không mở.",
         smoothScrollResponseLabel: "Phản hồi",
         mouseAccelerationName: "Tắt gia tốc chuột",
         mouseAccelerationCaption:

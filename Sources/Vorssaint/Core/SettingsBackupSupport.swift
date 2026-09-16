@@ -30,7 +30,6 @@ enum SettingsBackupSupport {
         DefaultsKey.shelfEnabled,
         DefaultsKey.finderCutPasteEnabled,
         DefaultsKey.textSnippets,
-        DefaultsKey.scratchpadDocument,
         DefaultsKey.radialMenuItems,
         DefaultsKey.radialMenuProfiles,
         DefaultsKey.commandBarLinks,
@@ -57,6 +56,10 @@ enum SettingsBackupSupport {
         DefaultsKey.panelPowerOrder,
         DefaultsKey.panelCollapsedSections,
         DefaultsKey.quickLauncherItemOrder,
+        // Legacy island layouts stay restorable; absence selects the new layout.
+        DefaultsKey.notchQuickAccessSide,
+        DefaultsKey.notchQuickAccessSecond,
+        DefaultsKey.notchQuickAccessThird,
         // Experience flags: a restored Mac must not replay onboarding or the
         // feature intros the user has already been through.
         DefaultsKey.hasOnboarded,
@@ -104,10 +107,12 @@ enum SettingsBackupSupport {
         DefaultsKey.whatsAppOrganizerLastFailed,
         // What one person runs most is habit, not configuration.
         DefaultsKey.commandBarUsage,
+        DefaultsKey.commandBarQueryHabits,
         // A chosen folder is authority on one Mac, not portable configuration.
         // Restoring it elsewhere could search a different volume or trigger a
         // protected-folder prompt without a fresh choice.
         DefaultsKey.commandBarFileScopes,
+        DefaultsKey.notchDownloadsFolderBookmark,
         // A local watermark file is authority on this Mac, not portable data.
         DefaultsKey.mediaImageWatermarkLogoPath,
         DefaultsKey.simulateUpdate,
@@ -118,6 +123,9 @@ enum SettingsBackupSupport {
         DefaultsKey.orphanedCaptureShortcutMigrated,
         DefaultsKey.settingsWindowWidth,
         DefaultsKey.settingsWindowHeight,
+        // The last magnifier level is session history; its remembered/default
+        // policy remains portable, but another Mac need not inherit the value.
+        DefaultsKey.screenshotLoupeLastZoom,
         DefaultsKey.screenshotSharingDeveloperEndpoint,
         // Whether the audio system let a recording hear the Mac's sound is a
         // grant this Mac gave, not a setting.
@@ -125,6 +133,7 @@ enum SettingsBackupSupport {
         DefaultsKey.fanControlRecoveryNeeded,
         DefaultsKey.fanControlHelperVersion,
         DefaultsKey.switcherNativeHotkeysSuppressed,
+        DefaultsKey.systemShortcutsSuppressed,
         // DDC capability belongs to one physical monitor on one Mac port.
         DefaultsKey.brightnessDDCWriteOnlyPaths,
     ]
@@ -228,6 +237,15 @@ enum SettingsBackupSupport {
 
     private static func portableMediaSettings(_ source: [String: Any]) -> [String: Any] {
         var settings = source
+        // Preset pictures are private files on this Mac. A backup carries the
+        // visual settings, never authority to read a caller-supplied image path.
+        if let data = settings[DefaultsKey.recorderEditorPresets] as? Data,
+           var presets = try? JSONDecoder().decode([RecorderEditPreset].self, from: data) {
+            for index in presets.indices where presets[index].images?.isEmpty == false {
+                presets[index].images = nil
+            }
+            settings[DefaultsKey.recorderEditorPresets] = try? JSONEncoder().encode(presets)
+        }
         if let rawProfiles = settings[DefaultsKey.mediaImageProfiles] as? String {
             if let portableProfiles = MediaSupport.portableImageProfiles(rawProfiles) {
                 settings[DefaultsKey.mediaImageProfiles] = portableProfiles
@@ -252,6 +270,20 @@ enum SettingsBackupSupport {
         return settings
     }
 
+    /// Restoring settings on the same Mac keeps the pictures already owned by
+    /// matching presets, just as mouse exceptions keep their local paths.
+    static func preservingLocalPresetImages(restored: Data, local: Data?) -> Data {
+        guard var presets = try? JSONDecoder().decode([RecorderEditPreset].self, from: restored),
+              let local,
+              let localPresets = try? JSONDecoder().decode([RecorderEditPreset].self, from: local)
+        else { return restored }
+        for index in presets.indices where presets[index].images == nil {
+            let id = presets[index].id
+            presets[index].images = localPresets.first { $0.id == id }?.images
+        }
+        return (try? JSONEncoder().encode(presets)) ?? restored
+    }
+
     /// A backup is a file the user can hand around and edit, so a value has to
     /// look like the setting it claims to be before it is written back. The
     /// registered defaults already say what each setting is, and a value of
@@ -259,8 +291,10 @@ enum SettingsBackupSupport {
     /// switch belongs, or text where a number belongs, would otherwise reach
     /// code that trusts its own settings.
     static func valueLooksRight(_ key: String, _ value: Any) -> Bool {
-        if key == DefaultsKey.scratchpadDocument {
-            return ScratchpadDocument.decoded(value as? Data, defaultName: "Scratchpad") != nil
+        switch key {
+        case DefaultsKey.notchQuickAccessSide, DefaultsKey.notchQuickAccessSecond, DefaultsKey.notchQuickAccessThird:
+            return value is String
+        default: break
         }
         guard let expected = Defaults.registeredDefaults[key] else {
             // Not a registered setting, so there is nothing to compare

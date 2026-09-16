@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
 
+import Carbon.HIToolbox
 import CoreGraphics
 import Foundation
 
@@ -67,6 +68,19 @@ enum ScreenCaptureTool: String, CaseIterable {
         }
     }
 
+    var showCaptureMenuOnShortcutKey: String {
+        switch self {
+        case .screenshot: return DefaultsKey.screenshotShowCaptureMenuOnShortcut
+        case .recording: return DefaultsKey.recorderShowCaptureMenuOnShortcut
+        case .text: return DefaultsKey.screenOCRShowCaptureMenuOnShortcut
+        case .color: return DefaultsKey.colorPickerShowCaptureMenuOnShortcut
+        }
+    }
+
+    func showsCaptureMenu(fromShortcut: Bool, defaults: UserDefaults = .standard) -> Bool {
+        !fromShortcut || (defaults.object(forKey: showCaptureMenuOnShortcutKey) as? Bool ?? true)
+    }
+
     var systemImageName: String {
         switch self {
         case .screenshot: return "camera.viewfinder"
@@ -75,6 +89,11 @@ enum ScreenCaptureTool: String, CaseIterable {
         case .color: return "eyedropper"
         }
     }
+
+    /// Only the recorder writes sound, so its microphone and system-audio
+    /// choices are the only tool controls that belong under the chooser.
+    /// Every other mode leaves them out entirely, reserving no space for them.
+    var capturesAudio: Bool { self == .recording }
 
     func settingsTitle(_ strings: Strings, language: AppLanguage) -> String {
         switch self {
@@ -101,15 +120,20 @@ enum ScreenshotSupport {
         let freeze: Bool
         let includePointer: Bool
         let hideVorssaintWindows: Bool
+        /// Whether editors and pinned captures stay out of the picture and the
+        /// pickable windows. Recording keeps them out even while "Hide
+        /// Vorssaint windows" is off, which that flag alone cannot tell apart.
+        let keepsContentWindowsOut: Bool
         let usesGeometry: Bool
 
         /// Two tools can want the same photograph and still do different
         /// things with it, so only the fields that decide which pixels are
-        /// taken force a new one.
+        /// taken, and which windows can be picked, force a new one.
         func sharesSource(with other: UnifiedCapturePolicy) -> Bool {
             freeze == other.freeze
                 && includePointer == other.includePointer
                 && hideVorssaintWindows == other.hideVorssaintWindows
+                && keepsContentWindowsOut == other.keepsContentWindowsOut
         }
     }
 
@@ -122,6 +146,7 @@ enum ScreenshotSupport {
             freeze: tool == .screenshot ? screenshotFreeze : true,
             includePointer: tool == .screenshot && screenshotIncludePointer,
             hideVorssaintWindows: tool != .recording && screenshotHideVorssaintWindows,
+            keepsContentWindowsOut: tool == .recording || screenshotHideVorssaintWindows,
             usesGeometry: tool == .recording)
     }
 
@@ -135,6 +160,11 @@ enum ScreenshotSupport {
         isAvailable: (AppFeature) -> Bool = { $0.isAvailable }
     ) -> Bool {
         isAvailable(selected.feature)
+    }
+
+    static func selectionDimAlpha(notchControls: Bool, isFrozen: Bool, isDragging: Bool) -> CGFloat {
+        if notchControls { return isDragging ? 0.18 : 0 }
+        return isFrozen ? 0.22 : 0.18
     }
 
     static func captureGuideIsVisible(pointerOnDisplay: Bool,
@@ -1183,6 +1213,141 @@ enum ScreenshotSupport {
             return index + 1
         }
 
+        static func bindings(from raw: String?) -> [Tool: GlobalShortcut] {
+            var result: [Tool: GlobalShortcut] = [:]
+            for entry in (raw ?? "").split(separator: ",") {
+                let pair = entry.split(separator: "=", maxSplits: 1)
+                guard pair.count == 2, let tool = Tool(rawValue: String(pair[0])),
+                      let shortcut = GlobalShortcut(storageValue: String(pair[1]), requiringModifier: false),
+                      !isReservedEditorKey(shortcut) else { continue }
+                result[tool] = shortcut
+            }
+            // Edited backups can contain duplicate bindings. Keep one owner,
+            // in rail-default order, so routing and the displayed keys agree.
+            var seen = Set<GlobalShortcut>()
+            for tool in allCases {
+                if let shortcut = result[tool], !seen.insert(shortcut).inserted {
+                    result[tool] = nil
+                }
+            }
+            return result
+        }
+
+        /// A layout or Caps Lock change can make a saved symbol type a rail
+        /// digit. Suspend it in that context without erasing the saved choice.
+        static func activeBindings(from raw: String?, capsLockOn: Bool = false) -> [Tool: GlobalShortcut] {
+            bindings(from: raw).filter { shortcutDigit($0.value, capsLockOn: capsLockOn) == nil }
+        }
+
+        static func bindingsStorage(_ bindings: [Tool: GlobalShortcut]) -> String {
+            allCases.compactMap { tool in
+                bindings[tool].map { "\(tool.rawValue)=\($0.storageValue)" }
+            }.joined(separator: ",")
+        }
+
+        static func isReservedEditorKey(_ shortcut: GlobalShortcut) -> Bool {
+            let key = Int(shortcut.keyCode)
+            if shortcut.modifiers.contains(.command) {
+                // The editor's Command branch also accepts extra modifiers.
+                return [kVK_ANSI_C, kVK_ANSI_S, kVK_ANSI_Z, kVK_ANSI_P,
+                        kVK_ANSI_0, kVK_ANSI_1, kVK_ANSI_Equal, kVK_ANSI_Minus,
+                        kVK_Delete, kVK_ForwardDelete, kVK_ANSI_W, kVK_ANSI_Q].contains(key)
+            }
+            return !shortcut.modifiers.hasPrimaryModifier
+                && [kVK_Escape, kVK_Return, kVK_ANSI_KeypadEnter,
+                    kVK_Delete, kVK_ForwardDelete].contains(key)
+        }
+
+        static func shortcutTool(keyCode: Int64, modifiers: GlobalShortcutModifiers,
+                                 number: Int? = nil, orderRaw: String?,
+                                 bindingsRaw: String?, enabled: Bool, capsLockOn: Bool = false) -> Tool? {
+            guard enabled else { return nil }
+            let bindings = activeBindings(from: bindingsRaw, capsLockOn: capsLockOn)
+            // The event's printed digit is authoritative, including input
+            // methods whose output differs from the underlying keycap table.
+            if !modifiers.hasPrimaryModifier, let number, (1...shortcutLimit).contains(number) {
+                guard let tool = shortcutTool(number: number, orderRaw: orderRaw, enabled: true),
+                      bindings[tool] == nil else { return nil }
+                return tool
+            }
+            let shortcut = GlobalShortcut(keyCode: keyCode, modifiers: modifiers)
+            return allCases.first(where: { bindings[$0] == shortcut })
+        }
+
+        /// The rail slot a recorded key names, read from what the key types
+        /// on the active layout rather than from its position: AZERTY's 1 is
+        /// Shift on the & key, and the numerical variant also reaches it
+        /// through Caps Lock. Recording carries the actual lock state rather
+        /// than trying to recover it from the stored shortcut's modifiers.
+        static func shortcutDigit(_ shortcut: GlobalShortcut, capsLockOn: Bool = false) -> Int? {
+            guard !shortcut.modifiers.hasPrimaryModifier else { return nil }
+            let shifted = shortcut.modifiers.contains(.shift)
+            let typed = GlobalShortcut.layoutKeyLabel(for: shortcut.keyCode, usesCommand: false,
+                                                      usesShift: shifted, capsLockOn: capsLockOn)
+                ?? (shifted || capsLockOn ? nil : shortcut.displayString)
+            guard let typed, let digit = Int(typed), (1...shortcutLimit).contains(digit)
+            else { return nil }
+            return digit
+        }
+
+        /// What the rail badge and the recorder show for a tool: its own
+        /// binding's caps, or the position digit of an unbound tool in the
+        /// first nine.
+        static func shortcutLabel(for tool: Tool, orderRaw: String?,
+                                  bindingsRaw: String?, enabled: Bool, capsLockOn: Bool = false) -> String? {
+            guard enabled else { return nil }
+            if let binding = activeBindings(from: bindingsRaw, capsLockOn: capsLockOn)[tool] {
+                return binding.displayString
+            }
+            return shortcutNumber(for: tool, orderRaw: orderRaw, enabled: true).map(String.init)
+        }
+
+        /// Why a recorded key cannot become a binding, or nil when it can.
+        /// Digits never get here: they move the tool instead. The outside
+        /// checks are the same three every shortcut field runs, passed in by
+        /// the field so the order and the early return are testable without
+        /// defaults or the WindowServer. Recording silences those owners, so
+        /// the key records fine and then fires them once the field lets go:
+        /// macOS and the app's global taps answer before the editor's window
+        /// monitor ever sees the press. The system table is asked last
+        /// because it is the one read that leaves the process.
+        enum BindingRejection: Equatable {
+            case reserved
+            case tool(Tool)
+            case role(GlobalShortcutRole)
+            case windowLayout(String)
+            case system
+        }
+
+        static func bindingRejection(
+            for shortcut: GlobalShortcut, excluding tool: Tool, bindingsRaw: String?,
+            roleConflict: (GlobalShortcut) -> GlobalShortcutRole?,
+            windowLayoutConflict: (GlobalShortcut) -> String?,
+            systemConflict: (GlobalShortcut) -> Bool
+        ) -> BindingRejection? {
+            if isReservedEditorKey(shortcut) { return .reserved }
+            let bindings = bindings(from: bindingsRaw)
+            if let other = allCases.first(where: { $0 != tool && bindings[$0] == shortcut }) {
+                return .tool(other)
+            }
+            if let role = roleConflict(shortcut) { return .role(role) }
+            if let title = windowLayoutConflict(shortcut) { return .windowLayout(title) }
+            return systemConflict(shortcut) ? .system : nil
+        }
+
+        /// A recorded digit moves the tool; clearing moves it below the first
+        /// nine. Other bindings stay attached to their tools through reorders.
+        static func assigningBinding(_ shortcut: GlobalShortcut?, digit: Int? = nil,
+                                     to tool: Tool, orderRaw: String?, bindingsRaw: String?)
+            -> (orderRaw: String, bindingsRaw: String) {
+            var bindings = bindings(from: bindingsRaw)
+            bindings[tool] = digit == nil ? shortcut : nil
+            let order = shortcut == nil || digit != nil
+                ? assigningShortcut(digit, to: tool, orderRaw: orderRaw)
+                : ordered(from: orderRaw)
+            return (order.map(\.rawValue).joined(separator: ","), bindingsStorage(bindings))
+        }
+
         /// Assigning a number is the same operation as moving the tool into
         /// that numbered rail slot. Choosing no shortcut moves it just below
         /// the first nine, where it remains available without a key.
@@ -1447,16 +1612,68 @@ enum ScreenshotSupport {
     static var captureLoupeMaxZoom: CGFloat {
         captureLoupeBaseSampleSide / captureLoupeMinSampleSide
     }
+    static let captureLoupeDefaultZooms: [Double] = [0.5, 1, 2, 4]
     /// The magnifier square on screen, in view points. Big enough that each
     /// sampled pixel becomes a readable grid cell at every zoom level.
     static let captureLoupeFrameSide: CGFloat = 132
 
-    static func captureLoupeZoom(_ zoom: CGFloat, adjustedBy scrollDelta: CGFloat) -> CGFloat {
-        guard scrollDelta != 0 else {
+    static func captureLoupeInitialZoom(rememberLast: Bool,
+                                        defaultZoom: CGFloat,
+                                        lastZoom: CGFloat) -> CGFloat {
+        let requested = rememberLast ? lastZoom : defaultZoom
+        guard requested.isFinite else { return 1 }
+        return min(max(requested, captureLoupeMinZoom), captureLoupeMaxZoom)
+    }
+
+    static func captureLoupeUsesSteppedZoom(steppedByDefault: Bool,
+                                             optionPressed: Bool) -> Bool {
+        steppedByDefault != optionPressed
+    }
+
+    /// A few high-resolution mouse drivers put sub-notch movement only in
+    /// the fixed-point wheel field. `NSEvent.scrollingDeltaY` rounds those
+    /// packets to zero, which would make apparently random notches disappear.
+    static func captureLoupeWheelDelta(scrollingDelta: CGFloat,
+                                       lineDelta: Int64,
+                                       fixedPointDelta: Double) -> CGFloat {
+        if fixedPointDelta.isFinite, fixedPointDelta != 0 {
+            return CGFloat(fixedPointDelta)
+        }
+        if lineDelta != 0 { return CGFloat(lineDelta) }
+        return scrollingDelta.isFinite ? scrollingDelta : 0
+    }
+
+    /// Fast mode preserves the original one-step-per-event behavior.
+    static func captureLoupeZoom(_ zoom: CGFloat,
+                                 adjustedBy scrollDelta: CGFloat) -> CGFloat {
+        guard scrollDelta.isFinite, scrollDelta != 0 else {
             return min(max(zoom, captureLoupeMinZoom), captureLoupeMaxZoom)
         }
         let factor: CGFloat = scrollDelta > 0 ? 1.15 : 1 / 1.15
         return min(max(zoom * factor, captureLoupeMinZoom), captureLoupeMaxZoom)
+    }
+
+    /// Step mode advances by exactly one drawable pixel-grid level. A fixed
+    /// percentage cannot promise that: at the wide end it can skip two odd
+    /// sample sizes, while at the narrow end it can round back to the same
+    /// size and appear to do nothing.
+    static func captureLoupeSteppedZoom(_ zoom: CGFloat,
+                                        adjustedBy scrollDelta: CGFloat) -> CGFloat {
+        let clamped = min(max(zoom, captureLoupeMinZoom), captureLoupeMaxZoom)
+        guard scrollDelta.isFinite, scrollDelta != 0 else { return clamped }
+
+        let currentSide = captureLoupeSampleSide(zoom: clamped)
+        let widestSide = captureLoupeSampleSide(zoom: captureLoupeMinZoom)
+        let targetSide = scrollDelta > 0
+            ? max(captureLoupeMinSampleSide, currentSide - 2)
+            : min(widestSide, currentSide + 2)
+        guard targetSide != currentSide else { return clamped }
+
+        // The widest level lies just below the numeric minimum when expressed
+        // as base / side, so it deliberately resolves to the public boundary.
+        if targetSide == widestSide { return captureLoupeMinZoom }
+        return min(max(captureLoupeBaseSampleSide / targetSide,
+                       captureLoupeMinZoom), captureLoupeMaxZoom)
     }
 
     /// Sampled source pixels per side. Always an odd whole number, never

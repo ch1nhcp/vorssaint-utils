@@ -21,3 +21,4 @@
 "NSDocumentsFolderUsageDescription" = "Vorssaint sắp xếp các tệp WhatsApp đã tải xuống và xác nhận vào thư mục đích mà bạn tự chọn.";
 "NSNetworkVolumesUsageDescription" = "Vorssaint sắp xếp các tệp WhatsApp đã tải xuống và xác nhận vào thư mục đích mà bạn tự chọn.";
 "NSRemovableVolumesUsageDescription" = "Vorssaint sắp xếp các tệp WhatsApp đã tải xuống và xác nhận vào thư mục đích mà bạn tự chọn.";
+"NSCalendarsFullAccessUsageDescription" = "Hiển thị các cuộc hẹn sắp tới của bạn trong Dynamic Island. Sự kiện lịch chỉ lưu trên Mac này.";
