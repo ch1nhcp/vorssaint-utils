@@ -200,7 +200,7 @@ extension BackupFeatureStrings {
 
     static let vi = BackupFeatureStrings(
         title: "Sao lưu",
-        description: "Chuyển cấu hình sang một Mac khác: xuất toàn bộ cài đặt ra một tệp rồi nhập tệp đó ở nơi đến. Tệp này bao gồm cả nội dung ghi chú trong Nháp. Lịch sử khay nhớ tạm, các mục trong Kệ và quyền hệ thống không bao giờ rời khỏi Mac này.",
+        description: "Chuyển cấu hình sang một Mac khác: xuất toàn bộ cài đặt ra một tệp rồi nhập tệp đó ở nơi đến. Tệp này bao gồm cả nội dung ghi chú trong Sổ nháp. Lịch sử khay nhớ tạm, các mục trong Kệ và quyền hệ thống không bao giờ rời khỏi Mac này.",
         exportButton: "Xuất cài đặt…",
         importButton: "Nhập cài đặt…",
         exported: "Đã lưu bản sao lưu",

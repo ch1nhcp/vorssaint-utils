@@ -377,7 +377,7 @@ extension SuperKeyStrings {
         soloCapsLock: "Bật/tắt chữ hoa",
         soloEscape: "Nhấn Escape",
         activeNow: "Đang hoạt động",
-        panelCaptionFormat: "Caps Lock giữ %@.",
+        panelCaptionFormat: "%1$@ giữ %2$@.",
         manageButton: "Thiết lập…",
         soloInputSource: "Chuyển nguồn nhập; giữ để dùng Caps Lock",
         mappingForeignMapping: "Một ứng dụng khác đang dùng phím đã chọn trong bản đồ phím riêng. Hãy xóa gán đó trong ứng dụng kia: chỉ thoát ứng dụng là chưa đủ.",
