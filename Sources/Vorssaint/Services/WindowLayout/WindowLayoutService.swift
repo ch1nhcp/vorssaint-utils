@@ -71,7 +71,7 @@ final class WindowLayoutService: ObservableObject {
     /// Read on every pointer event, so it is resolved once instead of per
     /// click.
     private static let ownProcessID = Int64(getpid())
-    private let frameTolerance: CGFloat = 8
+    private let frameTolerance = WindowLayoutGeometry.frameTolerance
     private let anchorTolerance: CGFloat = 36
     private let moveGestureUpdateInterval: TimeInterval = 1.0 / 120.0
     // AX frame mutations are not atomic. Complex windows can visibly render
@@ -80,11 +80,16 @@ final class WindowLayoutService: ObservableObject {
     private let resizeGestureUpdateInterval: TimeInterval = 1.0 / 60.0
     private let edgeSnapSampleInterval: TimeInterval = 1.0 / 30.0
 
-    private init() {}
+    private init() {
+        SessionActivity.shared.onChange { [weak self] _ in self?.syncWithPreferences() }
+    }
 
     func syncWithPreferences() {
         let available = AppFeature.windowLayout.isAvailable
-        let trusted = AXIsProcessTrusted()
+        let trusted = SessionActivitySupport.tapShouldRun(
+            featureWanted: available,
+            accessibilityGranted: AXIsProcessTrusted(),
+            sessionIsActive: SessionActivity.shared.isActive)
         let wantsShortcuts = available
             && UserDefaults.standard.bool(forKey: DefaultsKey.windowLayoutShortcutsEnabled)
             && trusted
@@ -222,6 +227,26 @@ final class WindowLayoutService: ObservableObject {
             frameHistory.discardLatest(for: target.key)
             return finish(.failure(.failed))
         }
+        if let crossing = WindowLayoutGeometry.displayCrossing(for: action,
+                                                               previousAction: lastActions[target.key]),
+           accepted(actual: target.frame,
+                    targetRect: placement(for: action,
+                                          current: target.frame,
+                                          visibleFrame: screen.visibleFrame).rect,
+                    action: action),
+           let destination = sidewaysScreen(to: screen,
+                                            screens: screens,
+                                            movingRight: crossing.movingRight) {
+            // The window is already parked on that side, so the same shortcut
+            // keeps pushing in the same direction: over to the display beside
+            // it, snapped against the edge it came in through. Without a
+            // display on that side the placement below simply leaves it where
+            // it is.
+            return applyPlacement(crossing.action,
+                                  to: target,
+                                  visibleFrame: destination.visibleFrame,
+                                  cyclesRepeatedAction: false)
+        }
         return applyPlacement(action,
                               to: target,
                               visibleFrame: screen.visibleFrame)
@@ -232,36 +257,6 @@ final class WindowLayoutService: ObservableObject {
     /// goes through the same settling and recovery path as every Window Layout
     /// placement instead of maintaining a second AX mutation algorithm.
     @discardableResult
-    func place(windowID: CGWindowID,
-               pid: pid_t,
-               at snapTarget: WindowEdgeSnapTarget) -> Bool {
-        guard AXIsProcessTrusted(),
-              let app = NSRunningApplication(processIdentifier: pid),
-              !app.isTerminated,
-              let onScreenWindowIDs = onScreenWindowIDs()
-        else { return false }
-
-        let axApp = AXUIElementCreateApplication(pid)
-        AXUIElementSetMessagingTimeout(axApp, 0.35)
-        guard let windows = windowsAttribute(axApp),
-              let window = windows.first(where: {
-            AXWindowResolver.windowID(for: $0) == windowID
-        }),
-              let target = target(from: window,
-                                  app: app,
-                                  onScreenWindowIDs: onScreenWindowIDs,
-                                  capability: .frame)
-        else { return false }
-
-        pruneWindowState(keeping: target.key)
-        let result = applyPlacement(snapTarget.action,
-                                    to: target,
-                                    visibleFrame: snapTarget.visibleFrame,
-                                    cyclesRepeatedAction: false)
-        if case .success = result { return true }
-        return false
-    }
-
     private func finish(_ result: WindowLayoutResult) -> WindowLayoutResult {
         resultGeneration += 1
         lastResult = result
@@ -317,14 +312,21 @@ final class WindowLayoutService: ObservableObject {
         guard let onScreenWindowIDs = onScreenWindowIDs() else { return nil }
         for pid in pids {
             let isFocusedOwnApp = pid == ownPID && hasFocusedResizableOwnWindow
-            guard let app = NSWorkspace.shared.runningApplications.first(where: { $0.processIdentifier == pid }),
+            // One lookup by pid, not a fresh bridge of every running app on
+            // each turn of a list that can hold dozens of them. The edge-snap
+            // drag in this same file already resolves its app this way.
+            // isTerminated is explicit because runningApplications drops a dead
+            // pid on its own and NSRunningApplication(processIdentifier:) does
+            // not: it answers with a terminated instance.
+            guard let app = NSRunningApplication(processIdentifier: pid),
+                  !app.isTerminated,
                   isFocusedOwnApp
                     || (app.activationPolicy == .regular && !app.isHidden
                         && app.bundleIdentifier != ownBundleID)
             else { continue }
             let axApp = AXUIElementCreateApplication(pid)
             // Bounded AX: a hung app in the MRU list must not stall the main
-            // thread (and every event tap) for the 6 second default timeout.
+            // thread (and every event tap) for the default timeout.
             AXUIElementSetMessagingTimeout(axApp, 0.35)
             for attribute in [kAXFocusedWindowAttribute, kAXMainWindowAttribute] {
                 if let window = windowAttribute(axApp, attribute as String),
@@ -426,7 +428,9 @@ final class WindowLayoutService: ObservableObject {
                            visibleFrame: NSRect) -> WindowLayoutPlacement {
         let rect = WindowLayoutGeometry.rect(for: action,
                                              current: appKitFrame(fromAX: current),
-                                             visibleFrame: visibleFrame)
+                                             visibleFrame: visibleFrame,
+                                             windowGap: WindowLayoutGaps.windowGap,
+                                             screenGap: WindowLayoutGaps.screenGap)
         let integral = rect.integral
         return WindowLayoutPlacement(frame: axFrame(fromAppKit: integral), rect: integral)
     }
@@ -504,6 +508,8 @@ final class WindowLayoutService: ObservableObject {
             return
         }
         if let original = context.original, shouldUseMaximizeFallback(for: context.action) {
+            // An ungapped scratch frame that coaxes a stubborn window into
+            // resizing; the gapped target is re-applied right after.
             let currentRect = appKitFrame(fromAX: original)
             let maxFrame = axFrame(fromAppKit: WindowLayoutGeometry.rect(for: .maximize,
                                                                          current: currentRect,
@@ -1042,7 +1048,11 @@ final class WindowLayoutService: ObservableObject {
     private func observeEdgeSnapEvent(type: CGEventType,
                                       event: CGEvent) -> Unmanaged<CGEvent>? {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
-            if let edgeSnapTap { CGEvent.tapEnable(tap: edgeSnapTap, enable: true) }
+            if SessionActivity.shared.isActive, AXIsProcessTrusted(), let edgeSnapTap {
+                CGEvent.tapEnable(tap: edgeSnapTap, enable: true)
+            } else {
+                DispatchQueue.main.async { [weak self] in self?.syncWithPreferences() }
+            }
             DispatchQueue.main.async { [weak self] in self?.cancelEdgeSnapTracking() }
             return Unmanaged.passUnretained(event)
         }
@@ -1488,7 +1498,11 @@ final class WindowLayoutService: ObservableObject {
 
         let tapDisabled = type == .tapDisabledByTimeout || type == .tapDisabledByUserInput
         if tapDisabled, let gestureTap {
-            CGEvent.tapEnable(tap: gestureTap, enable: true)
+            if SessionActivity.shared.isActive, AXIsProcessTrusted() {
+                CGEvent.tapEnable(tap: gestureTap, enable: true)
+            } else {
+                DispatchQueue.main.async { [weak self] in self?.syncWithPreferences() }
+            }
         }
 
         var chord: (button: WindowPointerGesture.Button, wantsResize: Bool)?
@@ -1746,7 +1760,8 @@ final class WindowLayoutService: ObservableObject {
     private func gestureTarget(at point: CGPoint,
                                requiresResize: Bool) -> WindowGestureTarget? {
         let system = AXUIElementCreateSystemWide()
-        AXUIElementSetMessagingTimeout(system, 0.25)
+        // No cap here: on the system-wide element a timeout is the default for
+        // every question this process asks, whoever asks it (#938).
         var rawElement: AXUIElement?
         guard AXUIElementCopyElementAtPosition(system, Float(point.x), Float(point.y), &rawElement) == .success,
               let element = rawElement
@@ -1845,6 +1860,19 @@ final class WindowLayoutService: ObservableObject {
                 currentIndex: currentIndex,
                 frames: screens.map(\.frame),
                 movingForward: movingForward
+              )
+        else { return nil }
+        return screens[destinationIndex]
+    }
+
+    private func sidewaysScreen(to current: NSScreen,
+                                screens: [NSScreen],
+                                movingRight: Bool) -> NSScreen? {
+        guard let currentIndex = screens.firstIndex(where: { $0 === current }),
+              let destinationIndex = WindowLayoutGeometry.horizontalNeighbourIndex(
+                currentIndex: currentIndex,
+                frames: screens.map(\.frame),
+                movingRight: movingRight
               )
         else { return nil }
         return screens[destinationIndex]

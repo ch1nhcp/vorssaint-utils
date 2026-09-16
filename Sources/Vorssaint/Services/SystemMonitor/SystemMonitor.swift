@@ -33,6 +33,9 @@ struct SystemSnapshot {
     var cpuTemperatureReadAt: TimeInterval?
     var gpuTemperature: Double?
     var batteryTemperature: Double?
+    /// The uptime timestamp of the last real battery sensor read. Cached values
+    /// keep their original timestamp so they cannot age into a sustained alert.
+    var batteryTemperatureReadAt: TimeInterval?
     var cpuUsage: Double?          // 0...1
     /// When `cpuUsage` was last really read, on the system uptime clock; the
     /// value is carried over failed reads, and the hot CPU alert has to tell
@@ -448,6 +451,8 @@ final class SystemMonitor: ObservableObject {
         let panelTemps = panelNeedsSystem && defaults.bool(forKey: DefaultsKey.monitorSysTemps)
         let alertCPU = defaults.bool(forKey: DefaultsKey.monitorAlertCPU)
         let alertCPUTemperature = defaults.bool(forKey: DefaultsKey.monitorAlertCPUTemperature)
+        let alertBatteryTemperature = hasInternalBattery
+            && defaults.bool(forKey: DefaultsKey.monitorAlertBatteryTemperature)
         let alertMemory = defaults.bool(forKey: DefaultsKey.monitorAlertMemory)
         let alertDisk = defaults.bool(forKey: DefaultsKey.monitorAlertDisk)
         let alertBattery = hasInternalBattery && defaults.bool(forKey: DefaultsKey.monitorAlertBattery)
@@ -472,7 +477,7 @@ final class SystemMonitor: ObservableObject {
         plan.needGPUTemperature = panelTemps || menuPanelNeeds.gpuTemperature ||
             defaults.bool(forKey: DefaultsKey.menuBarGPUTemperature)
         plan.needBatteryTemperature = hasInternalBattery && (panelTemps || menuPanelNeeds.batteryTemperature ||
-            defaults.bool(forKey: DefaultsKey.menuBarBatteryTemperature))
+            defaults.bool(forKey: DefaultsKey.menuBarBatteryTemperature) || alertBatteryTemperature)
         if defaults.bool(forKey: AppFeature.fanControl.availabilityKey),
            Self.fanTelemetryAvailable {
             plan.needFanSpeed = fullMonitorVisible || menuPanelNeeds.fanSpeed
@@ -765,6 +770,7 @@ final class SystemMonitor: ObservableObject {
                 } else {
                     next.batteryTemperature = self.batteryTemperatureCache?.value
                 }
+                next.batteryTemperatureReadAt = self.batteryTemperatureCache?.updatedAt
             }
             if plan.needFanSpeed {
                 if take(.fanSpeed) {
@@ -893,15 +899,21 @@ final class SystemMonitor: ObservableObject {
         tempKeysPrepared = true
 
         let all = client.keys { name in
-            name.hasPrefix("Tp") || name.hasPrefix("Te") || name.hasPrefix("Tg")
+            TemperatureSensorSelector.isCPUTemperatureKey(name, platform: cpuTemperaturePlatform)
+                || name.hasPrefix("Tg")
                 || name.range(of: "^TB[0-9]T$", options: .regularExpression) != nil
         }
-        cpuKeys = all.filter { $0.name.hasPrefix("Tp") || $0.name.hasPrefix("Te") }
+        cpuKeys = all.filter {
+            TemperatureSensorSelector.isCPUTemperatureKey($0.name,
+                                                          platform: cpuTemperaturePlatform)
+        }
         preferredCPUKeys = cpuKeys.filter {
             TemperatureSensorSelector.isCPUCoreKey($0.name, platform: cpuTemperaturePlatform)
         }
         let preferredNames = Set(preferredCPUKeys.map(\.name))
-        fallbackCPUKeys = cpuKeys.filter { !preferredNames.contains($0.name) }
+        fallbackCPUKeys = TemperatureSensorSelector.hasCPUCoreSet(platform: cpuTemperaturePlatform)
+            ? []
+            : cpuKeys.filter { !preferredNames.contains($0.name) }
         gpuKeys = all.filter { $0.name.hasPrefix("Tg") }
         batteryKeys = all.filter { $0.name.hasPrefix("TB") }
     }
@@ -1003,12 +1015,14 @@ final class SystemMonitor: ObservableObject {
                                            &iterator) == kIOReturnSuccess else { return nil }
         defer { IOObjectRelease(iterator) }
 
-        var entry = IOIteratorNext(iterator)
-        while entry != 0 {
-            defer {
-                IOObjectRelease(entry)
-                entry = IOIteratorNext(iterator)
-            }
+        // The advance lives in the `while` condition so the `defer` only
+        // releases. With the advance inside the defer, returning from the loop
+        // ran it: it released the entry it was done with and then took a
+        // reference on the next service that nothing released. Machines with a
+        // second IOAccelerator (Intel dual graphics, an eGPU) leaked one
+        // io_object_t per sampling tick that way.
+        while case let entry = IOIteratorNext(iterator), entry != 0 {
+            defer { IOObjectRelease(entry) }
             // Fetch ONLY PerformanceStatistics, not the whole (large) property
             // tree. Copying every property each tick is what made continuous GPU
             // sampling for the menu bar expensive.

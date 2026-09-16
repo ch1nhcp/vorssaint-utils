@@ -114,7 +114,6 @@ extension Strings {
         tabAbout: "Giới thiệu",
         tabReleaseNotes: "Có gì mới",
         releaseNotesOnUpdateToggle: "Hiện thông tin cập nhật sau khi cập nhật",
-        whatsNewDontShowAgain: "Không hiện lại",
         previewSizeLabel: "Kích thước xem trước",
         previewSizeNormal: "Bình thường",
         previewSizeLarge: "Lớn",
@@ -135,6 +134,9 @@ extension Strings {
         advancedUninstallConfirmTitle: "Gỡ cài đặt Vorssaint?",
         advancedUninstallConfirmBody:
             "Vorssaint sẽ xóa quyền truy cập, xóa tùy chọn cài đặt và chuyển vào Thùng rác, sau đó thoát. Việc này không thể hoàn tác từ ứng dụng, nhưng vẫn nằm trong Thùng rác cho đến khi được dọn sạch.",
+        advancedUninstallFailedTitle: "Đã dừng gỡ cài đặt",
+        advancedUninstallFailedBody:
+            "Vorssaint không thể khôi phục một cài đặt hệ thống đã thay đổi: chế độ ngủ, tốc độ quạt hoặc gia tốc chuột. Không có gì bị xóa. Hãy thử lại và cho phép yêu cầu mật khẩu nếu nó xuất hiện.",
 
         launchAtLogin: "Khởi chạy khi đăng nhập",
         languageLabel: "Ngôn ngữ",
@@ -234,6 +236,11 @@ extension Strings {
         switcherShortcutHintWindows: "Cửa sổ",
         switcherWindowShortcutCaption:
             "Mở bộ chuyển đổi cho các cửa sổ của ứng dụng đang ở phía trước. Khi bộ chuyển đổi ứng dụng đang mở, chuyển giữa các cửa sổ của ứng dụng đang chọn.",
+        switcherTakeOverSystemShortcuts: "Thay thế ⌘Tab và ⌘` của macOS",
+        switcherTakeOverSystemShortcutsCaption:
+            "Chỉ tắt các phím tắt ứng dụng và cửa sổ tương ứng của macOS trong khi bộ chuyển đổi của Vorssaint đang hoạt động. Mọi ứng dụng đang chạy vẫn có thể truy cập được.",
+        switcherAppearanceDelay: "Độ trễ khi xuất hiện",
+        switcherAppearanceDelayCaption: "Thời gian cần giữ phím tắt trước khi bộ chuyển đổi xuất hiện.",
         switcherMergeTabs: "Hiện một mục cho mỗi ứng dụng",
         switcherMergeTabsCaption:
             "Gộp toàn bộ cửa sổ của một ứng dụng thành một mục duy nhất trong bộ chuyển đổi, thay vì mỗi cửa sổ một mục.",
@@ -254,6 +261,9 @@ extension Strings {
         dockPreviewOpenDelay: "Độ trễ khi mở",
         dockPreviewOpenDelayCaption:
             "Thời gian con trỏ cần dừng trên một biểu tượng trước khi bảng của nó mở ra.",
+        dockPreviewQuitAppOnClose: "Thoát ứng dụng bằng nút ×",
+        dockPreviewQuitAppOnCloseCaption:
+            "Trong Dock Preview, × sẽ thoát toàn bộ ứng dụng thay vì chỉ đóng cửa sổ đó.",
         dockClickMinimize: "Nhấp biểu tượng Dock để thu nhỏ",
         dockClickMinimizeCaption:
             "Các cửa sổ của ứng dụng đang hoạt động sẽ thu nhỏ khi nhấp vào biểu tượng Dock của nó. Nhấp lại để hiện lại.",
@@ -277,6 +287,9 @@ extension Strings {
         cutPasteName: "Cắt & dán",
         cutPasteEnable: "Cắt & dán tệp trong Finder",
         cutPasteEnableCaption: "Dùng ⌘X để cắt và ⌘V để di chuyển tệp và thư mục trong Finder.",
+        cutPasteShowHUD: "Hiện bảng nổi",
+        cutPasteShowHUDCaption:
+            "Hiện một bảng nổi hiển thị các tệp đã cắt trong khi Finder đang hoạt động.",
         cutPasteHowTitle: "Cách sử dụng",
         cutPasteStep1: "Chọn các mục trong Finder và nhấn ⌘X để cắt.",
         cutPasteStep2: "Mở thư mục đích và nhấn ⌘V để di chuyển chúng vào đó.",
@@ -339,6 +352,9 @@ extension Strings {
         uninstallerDoneTitle: "Xong!",
         uninstallerFreedFormat: "Đã giải phóng %@",
         uninstallerSomeFailed: "Một số mục không thể chuyển vào Thùng rác.",
+        uninstallerFailedNeedsFDA:
+            "Dữ liệu ứng dụng chạy trong sandbox chỉ có thể di chuyển khi có Toàn quyền truy cập ổ đĩa. Mật khẩu quản trị viên không thay thế được quyền này.",
+        uninstallerFailedMoreFormat: "và %d mục nữa",
         uninstallerAnother: "Gỡ cài đặt ứng dụng khác",
         uninstallerCatApp: "Ứng dụng",
         uninstallerCatSupport: "Hỗ trợ",
@@ -487,6 +503,12 @@ extension Strings {
         mediaCompressionMedium: "Trung bình",
         mediaCompressionHigh: "Cao",
         mediaMaxSize: "Kích thước",
+        mediaSizingResolution: "Độ phân giải",
+        mediaSizingFileSize: "Dung lượng tệp",
+        mediaTargetSize: "Dung lượng mục tiêu",
+        mediaTargetSizeHint: "Độ phân giải sẽ tự điều chỉnh để giữ dung lượng dưới giới hạn này.",
+        mediaErrorTargetTooSmall: "Dung lượng mục tiêu quá nhỏ cho đoạn này. Hãy cắt bớt hoặc tăng giới hạn.",
+        mediaMegabytesSuffix: " MB",
         mediaWidth: "Chiều rộng",
         mediaFPS: "FPS",
         mediaKeepAudio: "Giữ âm thanh",
@@ -595,6 +617,10 @@ extension Strings {
         mixerLowerOnHeadphonesDisconnectCaption:
             "Điều chỉnh đầu ra khi tai nghe có dây hoặc Bluetooth ngắt kết nối.",
         mixerHeadphonesDisconnectVolume: "Âm lượng sau khi ngắt kết nối",
+        preciseVolumeRollerEnable: "Dùng bước âm lượng nhỏ hơn",
+        preciseVolumeRollerCaption:
+            "Biến con lăn và phím âm lượng thành các bước âm lượng hệ thống nhỏ hơn.",
+        preciseVolumeRollerTapFailed: "Không thể theo dõi phím âm lượng.",
         soundOutputSwitcherTitle: "Bộ chuyển đổi đầu ra",
         soundOutputSwitcherEnable: "Chuyển đầu ra bằng phím tắt",
         soundOutputSwitcherCaption:
@@ -736,6 +762,8 @@ extension Strings {
         diskSection: "Ổ đĩa",
         diskUsed: "đã dùng",
         diskFree: "còn trống",
+        diskAvailable: "khả dụng",
+        diskPurgeable: "có thể xóa",
         diskInternal: "Ổ trong",
         diskExternal: "Ổ ngoài",
         diskSelect: "Chọn ổ đĩa",
@@ -815,6 +843,8 @@ extension Strings {
         speedTestFailed: "Kiểm tra thất bại",
 
         monitorShowInPanel: "Hiện trên bảng điều khiển",
+        disclosureExpanded: "Đã mở rộng",
+        disclosureCollapsed: "Đã thu gọn",
         panelHideItem: "Ẩn khỏi bảng điều khiển",
         panelShowItem: "Hiện trên bảng điều khiển",
         panelHiddenItem: "Đã ẩn",
@@ -866,6 +896,10 @@ extension Strings {
         cleaningOverlaySubtitle: "Nhấn Escape 5 lần để mở khóa",
         cleaningOverlayUnlock: "Mở khóa",
         cleaningOverlayMouseHint: "Chuột và trackpad vẫn hoạt động bình thường",
+        cleaningKeepScreenVisibleToggle: "Giữ màn hình hiển thị",
+        cleaningKeepScreenVisibleCaption:
+            "Hiện một chỉ báo kín đáo ở góc màn hình thay vì làm tối toàn bộ nội dung.",
+        cleaningStartNow: "Khóa bàn phím ngay",
         cleaningNeedsAxTitle: "Cần quyền Trợ năng",
         cleaningNeedsAxBody:
             "Để khóa bàn phím an toàn, Vorssaint cần quyền Trợ năng. Hãy cấp quyền trong Cài đặt Hệ thống rồi thử lại.",
@@ -997,6 +1031,11 @@ extension Strings {
         cleanerNotifOpenSettings: "Mở Cài đặt Thông báo…",
         launchAtLoginNeedsApplications:
             "Ứng dụng đang chạy từ một vị trí không thể mở khi đăng nhập. Hãy kéo Vorssaint vào thư mục Ứng dụng, mở từ đó rồi bật lại tùy chọn này.",
+        launchAtLoginNeedsApproval:
+            "Mục khởi động đã được đăng ký, nhưng vẫn đang tắt trong Cài đặt Hệ thống. Mở Cài đặt Hệ thống › Chung › Mục khởi động và Tiện ích mở rộng, rồi bật Vorssaint trong mục Mở khi đăng nhập.",
+        ocrRemoveLineBreaksToggle: "Xóa ngắt dòng",
+        ocrRemoveLineBreaksCaption:
+            "Xóa các dấu ngắt dòng để văn bản đã sao chép dán thành một đoạn duy nhất.",
         ocrQRToggle: "Đọc mã QR",
         ocrQRCaption: "Nếu vùng chọn có mã QR, nội dung của nó sẽ hiện ra để sao chép hoặc mở.",
         ocrQRCopied: "Đã sao chép mã QR",
@@ -1035,11 +1074,22 @@ extension Strings {
         keepAwakeRightClickToggle:
             "Nhấp chuột phải vào biểu tượng trên thanh menu để bật/tắt Giữ máy thức",
         keepAwakeRightClickToggleCaption: "Thay thế menu ngữ cảnh khi nhấp chuột phải.",
-        urlCleanerCustomTitle: "Thêm tên cần xóa",
-        urlCleanerCustomPlaceholder: "ref, source",
-        urlCleanerCustomCaption:
-            "Ngăn cách tên các tham số bằng dấu phẩy. Chúng sẽ bị xóa khỏi mọi liên kết.",
-        urlCleanerCustomSaveButton: "Lưu",
+        urlCleanerRulesTitle: "Quy tắc làm sạch",
+        urlCleanerRulesCaption:
+            "Một trang web gắn các tham số này vào liên kết chia sẻ của riêng nó để theo dõi nguồn gốc liên kết. Khi bật, tên đó sẽ bị xóa lúc làm sạch liên kết; khi tắt, nó vẫn được giữ lại. Các tên tự thêm có thể xóa được.",
+        urlCleanerRulesCoverageCaption:
+            "Danh sách bao gồm các đường dẫn chia sẻ khác nhau của một trang — trang web, ứng dụng, phòng trực tiếp — nên khá dài; một liên kết thực tế thường chỉ mang theo hai đến bốn tham số trong số đó.",
+        urlCleanerRulesAllSites: "Tất cả trang web",
+        urlCleanerRulesCountSingular: "1 tham số",
+        urlCleanerRulesCountPluralFormat: "%d tham số",
+        urlCleanerRulesAddSite: "Thêm trang web",
+        urlCleanerRulesParameterPlaceholder: "Tên tham số",
+        urlCleanerRulesMatchCaption:
+            "Nhập tên ở bên trái dấu =, ví dụ utm_source. Tên trùng khớp sẽ loại bỏ đúng tham số đó khỏi liên kết và giữ nguyên phần còn lại.",
+        urlCleanerRulesAddButton: "Thêm",
+        urlCleanerRulesRemoveButton: "Xóa tên",
+        urlCleanerRulesRemoveSiteButton: "Tắt tất cả quy tắc của trang web này",
+        urlCleanerRemovedFormat: "Đã xóa %@",
         switcherSearchPin: "Ghim tìm kiếm với S",
         switcherSearchPinCaption:
             "S bắt đầu một lượt tìm kiếm và ghim bộ chuyển đổi luôn mở, nên việc gõ chữ sẽ không còn tạo ra ký tự đặc biệt khi phím tắt dùng ⌥, và một lượt tìm kiếm bắt đầu bằng Q hoặc W sẽ không còn vô tình đóng cửa sổ hay thoát ứng dụng.",
@@ -1055,6 +1105,24 @@ extension Strings {
         focusFollowsMouseName: "Tiêu điểm theo chuột",
         focusFollowsMouseCaption:
             "Đưa cửa sổ dưới con trỏ lên phía trước sau một khoảng dừng ngắn.",
-        focusFollowsMouseDelay: "Độ trễ khi di chuột qua"
+        focusFollowsMouseDelay: "Độ trễ khi di chuột qua",
+        switcherMinimizedPlacementLabel: "Cửa sổ đã thu nhỏ",
+        switcherMinimizedPlacementNormal: "Thứ tự bình thường",
+        switcherMinimizedPlacementEnd: "Đặt ở cuối",
+        switcherMinimizedPlacementHidden: "Ẩn",
+        switcherShowFullscreenWindows: "Hiện cửa sổ toàn màn hình",
+        switcherScreenPlacementLabel: "Hiện trên",
+        switcherScreenPlacementPointer: "Màn hình có con trỏ",
+        switcherScreenPlacementMenuBar: "Màn hình có thanh menu",
+        switcherScreenPlacementActiveWindow: "Màn hình có cửa sổ đang hoạt động",
+        switcherScreenPlacementCaption:
+            "Bộ chuyển đổi mở trên màn hình nào khi có nhiều hơn một màn hình được kết nối.",
+        smoothScrollResponseLabel: "Phản hồi",
+        mouseAccelerationName: "Tắt gia tốc chuột",
+        mouseAccelerationCaption:
+            "Loại bỏ gia tốc con trỏ cho các chuột đang kết nối. Cài đặt trước đó sẽ được khôi phục khi tắt tùy chọn này hoặc khi Vorssaint thoát.",
+        shelfClearOnClose: "Xóa khi đóng",
+        shelfClearOnCloseCaption:
+            "Chỉ làm trống kệ tạm khi nhấp vào nút đóng của nó. Ẩn tự động và thu gọn vẫn giữ lại các mục."
     )
 }

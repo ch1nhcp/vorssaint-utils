@@ -806,7 +806,7 @@ struct CleanerView: View {
             Button(l10n.s.uninstallerCancel) { cleaner.reset() }
             Button(String(format: l10n.s.cleanerCleanSizeFormat,
                           Self.byteString(cleaner.selectedSize))) {
-                cleaner.cleanSelected()
+                cleaner.cleanSelected(escalate: true)
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
@@ -905,7 +905,7 @@ struct PanelCleanerView: View {
             CleanerView(compact: true)
         }
         .padding(2)
-        .onAppear { PanelInteractionState.shared.keepsPopoverOpen = true }
-        .onDisappear { PanelInteractionState.shared.keepsPopoverOpen = false }
+        .onAppear { PanelInteractionState.shared.viewKeepsPopoverOpen = true }
+        .onDisappear { PanelInteractionState.shared.viewKeepsPopoverOpen = false }
     }
 }

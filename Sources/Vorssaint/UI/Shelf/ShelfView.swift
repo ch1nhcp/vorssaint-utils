@@ -149,7 +149,7 @@ struct ShelfView: View {
     }
 
     private var closeButton: some View {
-        Button { (onDismiss ?? { shelf.hide() })() } label: {
+        Button { (onDismiss ?? { shelf.close() })() } label: {
             Image(systemName: dismissSystemImage)
                 .font(.system(size: 13, weight: .semibold))
                 .frame(width: 30, height: 30)
@@ -214,6 +214,7 @@ struct ShelfView: View {
             emptyState
         } else {
             ShelfTilesView(items: shelf.visibleItems,
+                           contentRevision: shelf.contentRevision,
                            selection: shelf.selection,
                            expandedBatches: shelf.expandedBatches,
                            revealID: shelf.revealTargetID,

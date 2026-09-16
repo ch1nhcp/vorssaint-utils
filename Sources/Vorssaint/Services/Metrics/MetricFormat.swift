@@ -68,22 +68,28 @@ struct DiskIOCounters: Equatable {
 enum MetricFormat {
     // MARK: Memory
 
-    /// Matches Activity Monitor's "Memory Used": physical RAM minus pages that
-    /// are free, speculative, or file-backed cache. The side breakdown
-    /// (App/Wired/Compressed) does not expose every bucket counted in the total.
+    /// Matches Activity Monitor's Memory Used: app memory, wired memory,
+    /// compressed memory and the reserved tagged-memory storage region.
     static func memoryUsed(totalBytes: UInt64,
+                           appBytes: UInt64,
                            pageSize: UInt64,
-                           freePages: UInt64,
-                           speculativePages: UInt64,
-                           fileBackedPages: UInt64) -> UInt64 {
+                           wiredPages: UInt64,
+                           compressorPages: UInt64,
+                           tagStoragePages: UInt64) -> UInt64 {
         guard totalBytes > 0, pageSize > 0 else { return 0 }
-        let freeAndSpeculative = freePages.addingReportingOverflow(speculativePages)
-        guard !freeAndSpeculative.overflow else { return 0 }
-        let availablePages = freeAndSpeculative.partialValue.addingReportingOverflow(fileBackedPages)
-        guard !availablePages.overflow else { return 0 }
-        let availableBytes = availablePages.partialValue.multipliedReportingOverflow(by: pageSize)
-        guard !availableBytes.overflow else { return 0 }
-        return availableBytes.partialValue >= totalBytes ? 0 : totalBytes - availableBytes.partialValue
+        let wiredBytes = wiredPages.multipliedReportingOverflow(by: pageSize)
+        guard !wiredBytes.overflow else { return 0 }
+        let compressedBytes = compressorPages.multipliedReportingOverflow(by: pageSize)
+        guard !compressedBytes.overflow else { return 0 }
+        let tagStorageBytes = tagStoragePages.multipliedReportingOverflow(by: pageSize)
+        guard !tagStorageBytes.overflow else { return 0 }
+        let appAndWired = appBytes.addingReportingOverflow(wiredBytes.partialValue)
+        guard !appAndWired.overflow else { return 0 }
+        let withCompressed = appAndWired.partialValue.addingReportingOverflow(compressedBytes.partialValue)
+        guard !withCompressed.overflow else { return 0 }
+        let usedBytes = withCompressed.partialValue.addingReportingOverflow(tagStorageBytes.partialValue)
+        guard !usedBytes.overflow else { return 0 }
+        return min(usedBytes.partialValue, totalBytes)
     }
 
     /// Purgeable internal pages do not count because the system can reclaim
@@ -257,6 +263,48 @@ enum MetricFormat {
     /// A 0...1 fraction as a rounded percentage, e.g. "12%".
     static func percent(_ fraction: Double) -> String {
         "\(Int((max(0, min(1, fraction)) * 100).rounded()))%"
+    }
+
+    /// Keeps process breakdown values on the same 0...100 scale as the
+    /// aggregate hardware meters.
+    static func boundedPercentage(_ percentage: Double) -> Double {
+        guard percentage.isFinite else { return 0 }
+        return max(0, min(100, percentage))
+    }
+
+    static func machTimeNanoseconds(_ ticks: UInt64,
+                                    numerator: UInt32,
+                                    denominator: UInt32) -> UInt64? {
+        guard denominator > 0 else { return nil }
+        let divisor = UInt64(denominator)
+        let multiplier = UInt64(numerator)
+        let whole = (ticks / divisor).multipliedReportingOverflow(by: multiplier)
+        guard !whole.overflow else { return nil }
+        let remainder = (ticks % divisor).multipliedReportingOverflow(by: multiplier)
+        guard !remainder.overflow else { return nil }
+        let nanoseconds = whole.partialValue.addingReportingOverflow(remainder.partialValue / divisor)
+        return nanoseconds.overflow ? nil : nanoseconds.partialValue
+    }
+
+    /// Converts a process's cumulative CPU-time delta into its share of the
+    /// machine over the same wall-clock interval used by the system monitor.
+    static func processCPUPercentage(previousNanoseconds: UInt64,
+                                     currentNanoseconds: UInt64,
+                                     elapsed: TimeInterval,
+                                     processorCount: Int) -> Double {
+        guard currentNanoseconds >= previousNanoseconds,
+              elapsed > 0, elapsed.isFinite else { return 0 }
+        let capacityNanoseconds = elapsed * 1_000_000_000 * Double(max(1, processorCount))
+        return boundedPercentage(Double(currentNanoseconds - previousNanoseconds) / capacityNanoseconds * 100)
+    }
+
+    /// Sampling APIs do not share a clock and can briefly over-attribute work.
+    /// Never let the process rows claim more than the matching aggregate meter.
+    static func processReconciliationScale(sampledTotal: Double,
+                                           aggregatePercentage: Double?) -> Double {
+        guard sampledTotal.isFinite, sampledTotal > 0,
+              let aggregatePercentage, aggregatePercentage.isFinite else { return 1 }
+        return min(1, boundedPercentage(aggregatePercentage) / sampledTotal)
     }
 
     /// Smooths the GPU usage readout enough to hide one-sample compositor spikes
