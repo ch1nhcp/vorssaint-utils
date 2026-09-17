@@ -481,6 +481,7 @@ extension NotchEditorStrings {
         clickOpen: "Nhấn để mở",
         hoverPreview: "Xem trước khi di chuột qua",
         hoverExpand: "Mở rộng khi di chuột qua",
+        hiddenUntilHover: "Ẩn cho tới khi di chuột qua",
         resting: "Khi rảnh",
         destinations: "Nơi mở",
         separate: "Cửa sổ riêng",

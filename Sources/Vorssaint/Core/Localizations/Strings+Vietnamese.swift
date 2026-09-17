@@ -267,6 +267,8 @@ extension Strings {
         dockPreviewEnable: "Xem trước cửa sổ từ Dock",
         dockPreviewEnableCaption:
             "Di chuột qua một ứng dụng đang mở trên Dock để xem các cửa sổ của nó, sau đó nhấp vào cửa sổ muốn mở.",
+        dockPreviewCurrentSpaceOnlyCaption:
+            "Khi tắt, sẽ hiện cửa sổ từ mọi desktop. Chọn cửa sổ ở desktop khác sẽ chuyển bạn tới đó.",
         dockPreviewBackgroundOpacity: "Nền của bảng",
         dockPreviewBackgroundOpacityCaption: "Giảm xuống để thấy rõ hơn những gì phía sau bảng.",
         dockPreviewOpenDelay: "Độ trễ khi mở",
